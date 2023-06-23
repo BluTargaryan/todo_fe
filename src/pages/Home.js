@@ -221,7 +221,7 @@ const handleEditTask = (e) => {
 
 //to update task completion
 const editTaskCompleted = (id,priority,title,image,date, check) =>{
-  setTaskId(id)
+ 
   const updatedTask = {
     userId:userId,
     priority:priority,
@@ -230,7 +230,7 @@ const editTaskCompleted = (id,priority,title,image,date, check) =>{
     expectedDateTime:new Date(date),
     completed:(!check)
   };
-  editTask(taskId, updatedTask);
+  editTask(id, updatedTask);
   // window.location.reload();
   // console.log(updatedTask)
 }
@@ -238,15 +238,15 @@ const editTaskCompleted = (id,priority,title,image,date, check) =>{
 //to update subtask completion
 const editSubTaskCompleted = (taskId, id, title, check)=>{
   setTaskId(taskId)
-  setESId(id)
+
   setESTaskTitle(title)
   const updatedSubTask = {
     taskId: taskId,
-    title:esTitle,
+    title:title,
     completed:!check
   };
-  editSubTask(esId, updatedSubTask);
-  // console.log(updatedSubTask)
+  editSubTask(id, updatedSubTask);
+  // console.log(title)
  
   // window.location.reload();
 }
@@ -319,7 +319,7 @@ const handleEditSubTask = (e) => {
           <Task key={index} style={{ backgroundColor: taskBgColor }}>
           <span className="tasktitle">
             <input type="checkbox" className="radio-checkbox" checked={isCompleted} onClick={()=>editTaskCompleted(id,priority,title,image,datetime,isCompleted)}/>
-            <p onClick={()=>setImg(image)}>{title}</p>
+            <p onClick={()=>setImg(image)} style={{ textDecoration: isCompleted ? 'line-through' : 'none' }}>{title}</p>
           </span>
 
           {subtasks.length > 0 && (
@@ -335,8 +335,19 @@ const handleEditSubTask = (e) => {
                         checked={subtask.completed}
                         onClick={()=>editSubTaskCompleted(id,subtask.id,subtask.title, subtask.completed)}
                       />
-                      <p onClick={()=>{setEditSubVisible(true);  window.scrollTo(0, 0);
-  document.body.style.overflow = "hidden";setTaskId(id); setESId(subtask.id); setESTaskTitle(subtask.title)}}>{subtask.title}</p>
+     <p
+  onClick={() => {
+    setEditSubVisible(true);
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "hidden";
+    setTaskId(id);
+    setESId(subtask.id);
+    setESTaskTitle(subtask.title);
+  }}
+  style={{ textDecoration: subtask.completed ? 'line-through' : 'none' }}
+>
+  {subtask.title}
+</p>
                     </span>
                   );
                 }
@@ -387,10 +398,16 @@ useEffect(()=>{
 <img src={logo} alt="App logo" />
 <span>SwifTasks</span>
 </div>
-<div className="addTaskBtn" onClick={()=>{setAddTaskVisible(true);  window.scrollTo(0, 0);
+
+<div className="flex">
+<div className="Btn" onClick={()=>{setAddTaskVisible(true);  window.scrollTo(0, 0);
   document.body.style.overflow = "hidden";}}>
     <span >Add task</span>
 </div>
+
+<a href="/" className="Btn">Log out</a>
+</div>
+
          </Nav>
   <Body>
   <Image style={{ backgroundImage: `url(${img})`}}/>
@@ -406,7 +423,7 @@ useEffect(()=>{
             
             if (taskDueDate.toDateString() === today.toDateString()) {
               
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.isCompleted);
+              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
             }
           }
           return null;
@@ -454,7 +471,7 @@ useEffect(()=>{
             oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
             
             if (taskDueDate > oneWeekLater && taskDueDate <= oneMonthLater) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.isCompleted);
+              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
             }
           }
           return null;
@@ -478,7 +495,7 @@ useEffect(()=>{
             oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
             
             if (taskDueDate > oneMonthLater && taskDueDate <= oneYearLater) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.isCompleted);
+              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
             }
           }
           return null;
@@ -500,7 +517,7 @@ useEffect(()=>{
             oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
             
             if (taskDueDate > oneYearLater) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.isCompleted);
+              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
             }
           }
           return null;
@@ -520,7 +537,7 @@ useEffect(()=>{
             const today = new Date();
 
             if (taskDueDate < today) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.isCompleted);
+              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
             }
           }
           return null;
@@ -676,7 +693,14 @@ const Nav = styled(motion.div)`
         }
     }
 
-    .addTaskBtn{
+    .flex{
+      display: flex;
+      gap: 30px;
+
+      a{
+        text-decoration: none;
+      }
+      .Btn{
         width: 230px;
         height: 40px;
         display: flex;
@@ -691,6 +715,9 @@ const Nav = styled(motion.div)`
 background-color: ${hoverColor};
         }
     }
+    }
+
+   
 `
 
 const Body = styled(motion.div)`

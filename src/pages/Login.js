@@ -92,6 +92,8 @@ useEffect(()=>{
   )
   },[])
 
+ 
+
     return(
         <StyledLogin>
            <div className="img" onClick={ () => setDisplayForgotten(false)}/>
