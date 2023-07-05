@@ -32,6 +32,11 @@ const navigate= useNavigate()
           alert("Make sure your password is the same as your second password");
           return;
         }
+
+        if(consentCheck!==true){
+            alert("Please check the consent checkbox if you agree to our terms and want to create an account");
+            return;
+        }
       
         const user = { email, name, password };
         console.log(user);
@@ -60,6 +65,7 @@ const [name, setName] = useState('')
 const [email, setEmail] = useState('')
 const [password, setPassword] = useState('')
 const [passwordCheck, setPasswordCheck] = useState('')
+const [consentCheck, setConsentCheck]=useState(false)
     return(
         <StyledReg>
            <div className="img"/>
@@ -89,7 +95,16 @@ We are so excited to be your choice for organized ease and comfort.</h1>
                     <input type="password" value={passwordCheck}  onChange={(e)=>setPasswordCheck(e.target.value)} />
                 </div>
             
-           
+           <span id="regflex">
+            <input className="rad" type="checkbox" checked={consentCheck} onClick={()=>setConsentCheck(!consentCheck)}/>
+             <p>Data Usage and Confidentiality:
+
+By checking the box, you acknowledge and agree to the following:
+
+Your data will only be used for detail retrieval purposes.
+We will not tamper, edit, or divulge your data to anybody without your explicit consent.
+Thank you for your understanding and trust in our commitment to protecting your privacy.</p>
+           </span>
             <button onClick={handleClick}>Submit</button>
             </form>
          </div>
@@ -118,6 +133,7 @@ min-height: 100vh;
     width: 40%;
     margin-left: 10%;
     gap: 40px;
+    padding: 30px 0;
 
     .intro{
         width: 100%;
@@ -155,6 +171,49 @@ min-height: 100vh;
         }
     }
     
+    #regflex{
+        display: flex;
+        width: 100%;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        .rad{
+  width: 20px;
+  height: 20px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid ${mainColor};
+  border-radius: 100px;
+  outline: none;
+  background-color: transparent;
+
+  &:checked {
+  background-color: ${mainColor};
+}
+
+&::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 100px;
+  background-color: white;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  visibility: hidden;
+}
+
+&:checked::after {
+  visibility: visible;
+}
+}
+
+        p{
+            width: 90%;
+        }
+    }
    
     }
 

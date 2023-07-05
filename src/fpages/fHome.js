@@ -16,380 +16,7 @@ const highPriorityColor = "#D19B4A"
 const mediumPriorityColor = "#CED075"
 const lowPriorityColor = "#B9D3AA"
 
-const Home = () =>{
-  //states for add task form data
-  const [taskTitle, setTaskTitle] = useState('');
-const [taskDateTime, setTaskDateTime] = useState('');
-const [selectedPriority, setSelectedPriority] = useState("High");
-const [imageUrl, setImageUrl] = useState('');
-
-  //states for edit task form data
-  const [etaskTitle, eSetTaskTitle] = useState('');
-  const [etaskDateTime, eSetTaskDateTime] = useState('');
-const [eselectedPriority, eSetSelectedPriority] = useState("High");
-const [eimageUrl, eSetImageUrl] = useState('');
-
-//states for subtask form
-const [subTaskTitle, setSubTaskTitle] = useState('')
-
-//states for edit subtask form
-const [esId, setESId] = useState('')
-const [esTitle, setESTaskTitle] = useState('')
-
-
-//func to update task priority
-const updTaskPriority = (id, priority, title, image, datetime) =>{
-
-  const updatedTask = {
-    userId: userId,
-    priority: String(priority),
-    title: title,
-    imageUrl:image,
-    expectedDateTime: new Date(datetime),
-    isCompleted: false
-  };
-  editTask(id, updatedTask);
-// console.log(updatedTask)
-}
-
-//state for useLocation
-const { state } = useLocation();
-const userId = state && parseInt(state.userId);
-
-//state to display editTask menu
-
-const [editMenuVisible, setEditMenuVisible] = useState(false)
-
-//state to display addSubTask menu
-
-const [addSubVisible, setAddSubVisible] = useState(false)
-
-//state to display editSubTask menu
-
-const [editSubVisible, setEditSubVisible] = useState(false)
-
-//method to make editMenu visible as well as hinder scroll
-const editMenuVisibility = (id,title,priority,image) =>{
-eSetTaskTitle(title)
-eSetSelectedPriority(priority)
-eSetImageUrl(image)
-setTaskId(id)
-
-  setEditMenuVisible(true)
-  window.scrollTo(0, 0);
-  document.body.style.overflow = "hidden";
-}
-
-//to reverse editMenu func
-const revEditMenuVisibility = () =>{
-  setEditMenuVisible(false)
-  document.body.style.overflow = "auto";
-}
-
-
-    //default image
-    const [img, setImg] =useState(bgimg)
-    //state to enable addtask view
-    const [addTaskVisible, setAddTaskVisible] = useState(false);
-    const options = [
-        { value: 'Critical', label: 'Critical' },
-        { value: 'High', label: 'High' },
-        { value: 'Medium', label: 'Medium' },
-        { value: 'Low', label: 'Low' },
-      ];
-
-      //main add task engine
-      const addTask = (newTask) => {
-        fetch("http://localhost:8080/task/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newTask),
-        })
-          .then((res) => res.json())
-          .then((result) => {
-            // Handle the result if needed
-            console.log(result);
-            // Update the tasks list with the newly added task
-            setTasks([...tasks, result]);
-          })
-          .catch((error) => {
-            // Handle errors if any
-            console.error("Error adding task:", error);
-          });
-      };
-      //add task handle
-      const handleAddTask = (e) => {
-        e.preventDefault();
-        const newTask = {
-          userId:userId,
-          priority:String(selectedPriority),
-          title: taskTitle,
-          imageUrl: imageUrl,
-          expectedDateTime:new Date(taskDateTime),
-          isCompleted:false
-        };
-        addTask(newTask);
-        setAddTaskVisible(false)
-        window.location.reload();
-      };
-
-
-//add subtask handle
-
-      const addSubTask = (newSubTask) => {
-        fetch("http://localhost:8081/subtask/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newSubTask),
-        })
-          .then((res) => res.json())
-          .then((result) => {
-            // Handle the result if needed
-            console.log(result);
-            // Update the tasks list with the newly added task
-            setSubTasks([...subtasks, result]);
-          })
-          .catch((error) => {
-            // Handle errors if any
-            console.error("Error adding subtask:", error);
-          });
-      };
-
-      
-      const handleAddSubTask = (e, id, title) => {
-        e.preventDefault();
-        const newSubTask = {
-          taskId: id,
-          title:title,
-          completed:false
-        };
-        addSubTask(newSubTask);
-        setAddSubVisible(false)
-        window.location.reload();
-
-        // console.log(newSubTask)
-      };
-      // main edit task engine
-const editTask = (taskId, updatedTask) => {
-  fetch(`http://localhost:8080/task/${taskId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updatedTask),
-  })
-    .then((res) => res.json())
-    .then((result) => {
-      // Handle the result if needed
-      console.log(result);
-      // Update the tasks list with the edited task
-      const updatedTasks = tasks.map((task) => {
-        if (task.id === taskId) {
-          return result;
-        }
-        return task;
-      });
-      setTasks(updatedTasks);
-    })
-    .catch((error) => {
-      // Handle errors if any
-      console.error("Error editing task:", error);
-    });
-};
-
-//state for taskId
-const [taskId, setTaskId] = useState(0)
-// edit task handle
-const handleEditTask = (e) => {
-  e.preventDefault();
-  const updatedTask = {
-    userId: userId,
-    priority: String(eselectedPriority),
-    title: etaskTitle,
-    imageUrl: eimageUrl,
-    expectedDateTime: new Date(etaskDateTime),
-    isCompleted: false
-  };
-  editTask(taskId, updatedTask);
-  setEditMenuVisible(false);
-  window.location.reload();
-};
-
-//to update task completion
-const editTaskCompleted = (id,priority,title,image,date, check) =>{
- 
-  const updatedTask = {
-    userId:userId,
-    priority:priority,
-    title: title,
-    imageUrl: image,
-    expectedDateTime:new Date(date),
-    completed:(!check)
-  };
-  editTask(id, updatedTask);
-  // window.location.reload();
-  // console.log(updatedTask)
-}
-
-//to update subtask completion
-const editSubTaskCompleted = (taskId, id, title, check)=>{
-  setTaskId(taskId)
-
-  setESTaskTitle(title)
-  const updatedSubTask = {
-    taskId: taskId,
-    title:title,
-    completed:!check
-  };
-  editSubTask(id, updatedSubTask);
-  // console.log(title)
- 
-  // window.location.reload();
-}
-
-//edit subtask
-const editSubTask = (subId, updatedSubTask) => {
-  fetch(`http://localhost:8081/subtask/${subId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updatedSubTask),
-  })
-    .then((res) => res.json())
-    .then((result) => {
-      // Handle the result if needed
-      console.log(result);
-      // Update the tasks list with the edited task
-      const updatedSubTasks = subtasks.map((subtask) => {
-        if (subtask.id === subId) {
-          return result;
-        }
-        return subtask;
-      });
-      setSubTasks(updatedSubTasks);
-    })
-    .catch((error) => {
-      // Handle errors if any
-      console.error("Error editing task:", error);
-    });
-};
-
-const handleEditSubTask = (e) => {
-  e.preventDefault();
-  const updatedSubTask = {
-    taskId: taskId,
-    title:esTitle,
-    completed:false
-  };
-
-  // console.log(updatedSubTask)
-  editSubTask(esId, updatedSubTask);
-  setEditSubVisible(false);
-  window.location.reload();
-};
-
-      
-      //to return task component
-      const taskComp = (index,title, id, priority, image,datetime, isCompleted) =>{
-
-        
-
-        let taskBgColor
-        if(priority==="Critical"){
-          taskBgColor=critPriorityColor
-        }
-        if(priority==="High"){
-          taskBgColor=highPriorityColor
-        }
-        if(priority==="Medium"){
-          taskBgColor=mediumPriorityColor
-        }
-        if(priority==="Low"){
-          taskBgColor=lowPriorityColor
-        }
-
-        
-
-        return(
-          <Task key={index} style={{ backgroundColor: taskBgColor }}>
-          <span className="tasktitle">
-            <input type="checkbox" className="radio-checkbox" checked={isCompleted} onClick={()=>editTaskCompleted(id,priority,title,image,datetime,isCompleted)}/>
-            <p onClick={()=>setImg(image)} style={{ textDecoration: isCompleted ? 'line-through' : 'none' }}>{title}</p>
-          </span>
-
-          {subtasks.length > 0 && (
-            <span className="subtasklist">
-              {/* Display matching subtasks */}
-              {subtasks.map((subtask, subtaskIndex) => {
-                if (subtask.taskId === id) {
-                  return (
-                    <span className="subtask" key={subtaskIndex}>
-                      <input
-                        type="checkbox"
-                        className="radio-mini-checkbox"
-                        checked={subtask.completed}
-                        onClick={()=>editSubTaskCompleted(id,subtask.id,subtask.title, subtask.completed)}
-                      />
-     <p
-  onClick={() => {
-    setEditSubVisible(true);
-    window.scrollTo(0, 0);
-    document.body.style.overflow = "hidden";
-    setTaskId(id);
-    setESId(subtask.id);
-    setESTaskTitle(subtask.title);
-  }}
-  style={{ textDecoration: subtask.completed ? 'line-through' : 'none' }}
->
-  {subtask.title}
-</p>
-                    </span>
-                  );
-                }
-                return null;
-              })}
-            </span>
-          )}
-
-          <div className="menu">
-            <button onClick={()=>editMenuVisibility(id,title, priority, image)}>Update task</button>
-            <button  onClick={()=>{setAddSubVisible(true);  window.scrollTo(0, 0);
-  document.body.style.overflow = "hidden";setTaskId(id)}}>Add subtask</button>
-            <Select options={options} placeholder={priority} onChange={(selectedOption) => updTaskPriority(id,selectedOption.value,title,image,datetime)}/>
-          </div>
-        </Task>
-        )
-
-        
-      }
-
-//create states
-const [tasks, setTasks] = useState([])
-const [subtasks, setSubTasks] = useState([])
-
-useEffect(()=>{
-    fetch("http://localhost:8080/task/getAll")
-    .then(res=>res.json())
-    .then((result)=>{
-      setTasks(result);
-    }
-  )
-  },[])
-
-  useEffect(()=>{
-    fetch("http://localhost:8081/subtask/getAll")
-    .then(res=>res.json())
-    .then((result)=>{
-      setSubTasks(result);
-    }
-  )
-  },[])
-
+const fHome = () =>{
 
     return(
         <StyledHome>
@@ -414,138 +41,44 @@ useEffect(()=>{
   <Tasks>
   <h2>Today</h2>
   <div className="tasklist">
-    {tasks.length > 0 && (
-      <>
-        {tasks.map((task, index) => {
-          if (task.userId === userId) {
-            const taskDueDate = new Date(task.expectedDateTime);
-            const today = new Date();
-            
-            if (taskDueDate.toDateString() === today.toDateString()) {
-              
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
-            }
-          }
-          return null;
-        })}
-      </>
-    )}
-  </div>
-</Tasks>
-<Tasks>
-  <h2>This week</h2>
-  <div className="tasklist">
-    {tasks.length > 0 && (
-      <>
-        {tasks.map((task, index) => {
-          if (task.userId === userId) {
-            const taskDueDate = new Date(task.expectedDateTime);
-            const today = new Date();
-            const oneWeekLater = new Date();
-            oneWeekLater.setDate(oneWeekLater.getDate() + 7);
-            const isDueToday = taskDueDate.toDateString() === today.toDateString();
-            
-            if (!isDueToday && taskDueDate > today && taskDueDate <= oneWeekLater) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
-            }
-          }
-          return null;
-        })}
-      </>
-    )}
+  <Task key={index} style={{ backgroundColor: taskBgColor }}>
+          <span className="tasktitle">
+            <input type="checkbox" className="radio-checkbox" checked={isCompleted} onClick={()=>editTaskCompleted(id,priority,title,image,datetime,isCompleted)}/>
+            <p onClick={()=>setImg(image)} style={{ textDecoration: isCompleted ? 'line-through' : 'none' }}>{title}</p>
+          </span>
+
+          <span className="subtask" key={subtaskIndex}>
+                      <input
+                        type="checkbox"
+                        className="radio-mini-checkbox"
+                        checked={subtask.completed}
+                        onClick={()=>editSubTaskCompleted(id,subtask.id,subtask.title, subtask.completed)}
+                      />
+     <p
+  onClick={() => {
+    setEditSubVisible(true);
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "hidden";
+    setTaskId(id);
+    setESId(subtask.id);
+    setESTaskTitle(subtask.title);
+  }}
+  style={{ textDecoration: subtask.completed ? 'line-through' : 'none' }}
+>
+  {subtask.title}
+</p>
+                    </span>
+
+          <div className="menu">
+            <button onClick={()=>editMenuVisibility(id,title, priority, image)}>Update task</button>
+            <button  onClick={()=>{setAddSubVisible(true);  window.scrollTo(0, 0);
+  document.body.style.overflow = "hidden";setTaskId(id)}}>Add subtask</button>
+            <Select options={options} placeholder={priority} onChange={(selectedOption) => updTaskPriority(id,selectedOption.value,title,image,datetime)}/>
+          </div>
+        </Task>
   </div>
 </Tasks>
 
-<Tasks>
-  <h2>This month</h2>
-  <div className="tasklist">
-    {tasks.length > 0 && (
-      <>
-        {tasks.map((task, index) => {
-          if (task.userId === userId) {
-            const taskDueDate = new Date(task.expectedDateTime);
-            const today = new Date();
-            const oneWeekLater = new Date();
-            oneWeekLater.setDate(oneWeekLater.getDate() + 7);
-            const oneMonthLater = new Date();
-            oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
-            
-            if (taskDueDate > oneWeekLater && taskDueDate <= oneMonthLater) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
-            }
-          }
-          return null;
-        })}
-      </>
-    )}
-  </div>
-</Tasks>
-<Tasks>
-  <h2>This year</h2>
-  <div className="tasklist">
-    {tasks.length > 0 && (
-      <>
-        {tasks.map((task, index) => {
-          if (task.userId === userId) {
-            const taskDueDate = new Date(task.expectedDateTime);
-            const today = new Date();
-            const oneMonthLater = new Date();
-            oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
-            const oneYearLater = new Date();
-            oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
-            
-            if (taskDueDate > oneMonthLater && taskDueDate <= oneYearLater) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
-            }
-          }
-          return null;
-        })}
-      </>
-    )}
-  </div>
-</Tasks>
-<Tasks>
-  <h2>Later</h2>
-  <div className="tasklist">
-    {tasks.length > 0 && (
-      <>
-        {tasks.map((task, index) => {
-          if (task.userId === userId) {
-            const taskDueDate = new Date(task.expectedDateTime);
-            const today = new Date();
-            const oneYearLater = new Date();
-            oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
-            
-            if (taskDueDate > oneYearLater) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
-            }
-          }
-          return null;
-        })}
-      </>
-    )}
-  </div>
-</Tasks>
-<Tasks>
-  <h2>Past due date</h2>
-  <div className="tasklist">
-    {tasks.length > 0 && (
-      <>
-        {tasks.map((task, index) => {
-          if (task.userId === userId) {
-            const taskDueDate = new Date(task.expectedDateTime);
-            const today = new Date();
-
-            if (taskDueDate < today) {
-              return taskComp(index, task.title, task.id, task.priority, task.imageUrl, task.expectedDateTime, task.completed);
-            }
-          }
-          return null;
-        })}
-      </>
-    )}
-  </div>
-</Tasks>
 
 
          
@@ -572,7 +105,7 @@ useEffect(()=>{
                       <Select options={options} value={selectedPriority} placeholder={selectedPriority} onChange={(selectedOption) => setSelectedPriority(selectedOption.value)}/>
                   </div>
                   <div className="input">
-                      <label htmlFor="">Image URL <span>(Please don't use a Google image link)</span></label>
+                      <label htmlFor="">Image URL</label>
                       <input type="text" value={imageUrl} onChange={(e)=>setImageUrl(e.target.value)}/>
                   </div>
              
@@ -956,10 +489,6 @@ const AddMenu  = styled(motion.div)`
     gap: 22px;
         label{
             font-size: 20px;
-
-            span{
-              font-size: 18px;
-            }
         }
         input, Select{
             height: 45px;
@@ -1017,10 +546,6 @@ const EditMenu  = styled(motion.div)`
     gap: 22px;
         label{
             font-size: 20px;
-
-            span{
-              font-size: 18px;
-            }
         }
         input, Select{
             height: 45px;
@@ -1144,6 +669,6 @@ const EditSubTaskMenu  = styled(motion.div)`
     }
     }
 `
-export default Home;
+export default fHome;
 
    
